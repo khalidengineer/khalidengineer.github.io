@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Digital Menu Board (DMB) - 43" TV Display</title>
+    <link rel="shortcut icon" href="assets/images/header/favicon.svg" type="image/x-icon">
+    
+    <!-- Google Fonts for crisp TV readability -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.6.0/remixicon.css">
+
+    <style>
+        :root {
+            --bg-primary: #0a0c10;
+            --bg-card: rgba(18, 22, 34, 0.85);
+            --accent: #ff5722;
+            --accent-gradient: linear-gradient(135deg, #ff5722, #ff9800);
+            --neon-blue: #00d2ff;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --border-glow: rgba(255, 87, 34, 0.3);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --shadow-tv: 0 20px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        body, html {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--bg-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(255, 87, 34, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(0, 210, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, #0d111a 0%, #07090e 100%);
+            background-attachment: fixed;
+        }
+
+        /* Auto-hide cursor on TV inactivity */
+        body.hide-cursor {
+            cursor: none !important;
+        }
+
+        /* Master Display Container: Fixed 16:9 Aspect Ratio for 43" Smart TV */
+        .dmb-screen {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Top Header Navigation Bar */
+        .dmb-header {
+            height: 70px;
+            padding: 0 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(180deg, rgba(10, 12, 16, 0.95) 0%, rgba(10, 12, 16, 0.75) 80%, transparent 100%);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+            border-bottom: 1px solid var(--glass-border);
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        .dmb-header.hidden {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand-badge {
+            background: var(--accent-gradient);
+            color: #fff;
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: 1.5px;
+            padding: 0.35rem 0.85rem;
+            border-radius: 8px;
+            text-transform: uppercase;
+            box-shadow: 0 0 20px rgba(255, 87, 34, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .store-name-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .live-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #10b981;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        /* Clock & TV Status Right side */
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .digital-clock-wrapper {
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.35rem 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .clock-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 1px;
+        }
+
+        .clock-ampm {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+        }
+
+        .clock-date {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            border-left: 1px solid rgba(255, 255, 255, 0.15);
+            padding-left: 0.75rem;
+        }
+
+        .quick-action-btn {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+        }
+
+        .quick-action-btn:hover, .quick-action-btn:focus {
+            background: var(--accent);
+            color: #fff;
+            transform: scale(1.05);
+            outline: none;
+        }
+
+        /* Main Content Viewport */
+        .dmb-main {
+            position: relative;
+            flex: 1;
+            width: 100%;
+            height: calc(100vh - 70px);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dmb-main.full-viewport {
+            height: 100vh;
+        }
+
+        /* Mode 1: Full-Screen Slideshow */
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-item {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transform: scale(1.02);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            background: #000;
+        }
+
+        .slide-item.active {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        .slide-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Perfect for 43" TV menus without distortion */
+            object-position: center;
+            transition: all 0.3s ease;
+        }
+
+        .fit-cover .slide-image {
+            object-fit: cover;
+        }
+
+        /* Store Overlay Badge on Slide */
+        .slide-caption-badge {
+            position: absolute;
+            bottom: 2rem;
+            left: 2.5rem;
+            background: rgba(10, 12, 16, 0.85);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 0.75rem 1.5rem;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 20;
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .slide-store-name {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.3px;
+        }
+
+        .slide-counter {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            background: var(--accent-gradient);
+            color: #fff;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+
+        /* Mode 2: Multi-Item Grid Layout */
+        .grid-container {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            padding: 1.5rem;
+            gap: 1.5rem;
+            box-sizing: border-box;
+            align-items: stretch;
+        }
+
+        .grid-container.grid-1 {
+            grid-template-columns: 1fr;
+        }
+
+        .grid-container.grid-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .grid-container.grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-container.grid-4 {
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+        }
+
+        .grid-container.grid-many {
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+        }
+
+        .grid-card {
+            position: relative;
+            background: var(--bg-card);
+            border-radius: 18px;
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .grid-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+        }
+
+        .grid-card-img-wrap {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #050608;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .grid-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .grid-card-footer {
+            padding: 0.85rem 1.25rem;
+            background: rgba(15, 18, 28, 0.95);
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .grid-card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        /* Progress Bar for Slide Transition */
+        .slide-progress-bar-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 50;
+        }
+
+        .slide-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--accent-gradient);
+            box-shadow: 0 0 10px rgba(255, 87, 34, 0.8);
+            transition: width 0.1s linear;
+        }
+
+        /* TV Kiosk Navigation Arrows (discreet) */
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: rgba(10, 12, 16, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            color: #ffffff;
+            font-size: 1.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 40;
+        }
+
+        .dmb-screen:hover .nav-arrow {
+            opacity: 0.85;
+        }
+
+        .nav-arrow:hover {
+            opacity: 1;
+            background: var(--accent);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .nav-arrow.prev { left: 1.5rem; }
+        .nav-arrow.next { right: 1.5rem; }
+
+        /* Loading / Empty States */
+        .state-loader-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 12, 16, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            z-index: 200;
+            transition: opacity 0.5s ease;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 87, 34, 0.15);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loader-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .loader-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            max-width: 500px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .error-btn {
+            margin-top: 1rem;
+            background: var(--accent-gradient);
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            padding: 0.75rem 1.75rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(255, 87, 34, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Settings Drawer Modal for TV Customization */
+        .settings-panel {
+            position: fixed;
+            top: 85px;
+            right: 2.5rem;
+            width: 360px;
+            background: rgba(18, 22, 34, 0.95);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+            z-index: 300;
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .settings-panel.open {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .settings-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .setting-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .setting-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-toggle-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .btn-toggle-group.cols-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .toggle-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .toggle-btn.active {
+            background: var(--accent);
+            color: #ffffff;
+            border-color: var(--accent);
+            box-shadow: 0 0 12px rgba(255, 87, 34, 0.4);
+        }
+
+        .setting-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            padding: 0.6rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .setting-input:focus {
+            border-color: var(--accent);
+        }
+
+        .shortcuts-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: rgba(0, 0, 0, 0.25);
+            padding: 0.75rem;
+            border-radius: 8px;
+            line-height: 1.6;
+        }
+
+        .shortcuts-hint kbd {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            color: #fff;
+            font-family: monospace;
+        }
+
+        /* Toast notification */
+        .tv-toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2.5rem;
+            background: rgba(18, 22, 34, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 500;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .tv-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* 43" TV High-DPI and Orientation Responsive Media Queries */
+        @media (max-width: 1024px) {
+            .dmb-header {
+                padding: 0 1.25rem;
+                height: 60px;
+            }
+            .store-name-title {
+                font-size: 1.2rem;
+            }
+            .clock-time {
+                font-size: 1.15rem;
+            }
+        }
+
+        /* Portrait mode for vertical TV mounting (9:16) */
+        @media (orientation: portrait) {
+            .grid-container.grid-2,
+            .grid-container.grid-3 {
+                grid-template-columns: 1fr;
+            }
+            .slide-image {
+                object-fit: contain;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dmb-screen" id="dmbScreen">
+        <!-- Top Live Header Bar -->
+        <header class="dmb-header" id="dmbHeader">
+            <div class="brand-section">
+                <div class="brand-badge">
+                    <i class="ri-tv-line"></i> DMB 43"
+                </div>
+                <div class="store-name-title" id="displayStoreTitle">
+                    <span>Loading Store...</span>
+                </div>
+                <div class="live-status">
+                    <div class="status-dot"></div>
+                    <span id="liveStatusText">Connecting...</span>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <!-- TV Live Digital Clock -->
+                <div class="digital-clock-wrapper">
+                    <span class="clock-time" id="clockTime">00:00:00</span>
+                    <span class="clock-ampm" id="clockAmPm">AM</span>
+                    <span class="clock-date" id="clockDate">Mon, 01 Jan</span>
+                </div>
+
+                <!-- Quick Action Buttons -->
+                <button class="quick-action-btn" id="btnRefresh" title="Refresh Data (R)" aria-label="Refresh Data">
+                    <i class="ri-refresh-line"></i>
+                </button>
+                <button class="quick-action-btn" id="btnSettings" title="Settings (S)" aria-label="Settings">
+                    <i class="ri-settings-4-line"></i>
+                </button>
+                <button class="quick-action-btn" id="btnFullscreen" title="Toggle Fullscreen (F)" aria-label="Fullscreen">
+                    <i class="ri-fullscreen-line" id="fsIcon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Display Viewport -->
+        <main class="dmb-main" id="dmbMain">
+            <!-- Mode 1: Slideshow Viewport (Default) -->
+            <div class="slideshow-container" id="slideshowContainer"></div>
+
+            <!-- Mode 2: Multi-Card Grid Viewport -->
+            <div class="grid-container" id="gridContainer" style="display: none;"></div>
+
+            <!-- Navigation Arrows (discreet TV / Mouse controls) -->
+            <button class="nav-arrow prev" id="prevSlideBtn" aria-label="Previous Slide">
+                <i class="ri-arrow-left-s-line"></i>
+            </button>
+            <button class="nav-arrow next" id="nextSlideBtn" aria-label="Next Slide">
+                <i class="ri-arrow-right-s-line"></i>
+            </button>
+
+            <!-- Slide Interval Progress Bar -->
+            <div class="slide-progress-bar-container" id="progressBarContainer">
+                <div class="slide-progress-bar" id="progressBar"></div>
+            </div>
+        </main>
+
+        <!-- State Loader & Error Overlay -->
+        <div class="state-loader-overlay" id="loaderOverlay">
+            <div class="spinner"></div>
+            <h2 class="loader-title" id="loaderTitle">Connecting to Google Sheet...</h2>
+            <p class="loader-desc" id="loaderDesc">Fetching live menu board graphics and data for 43-inch TV display.</p>
+            <button class="error-btn" id="btnRetryFetch" style="display: none;">
+                <i class="ri-refresh-line"></i> Retry Connection
+            </button>
+        </div>
+
+        <!-- TV Settings / Control Panel Drawer -->
+        <aside class="settings-panel" id="settingsPanel">
+            <div class="settings-header">
+                <h3 class="settings-title"><i class="ri-equalizer-line"></i> TV Display Settings</h3>
+                <button class="quick-action-btn" id="btnCloseSettings" style="width:32px; height:32px;">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+
+            <!-- Layout Mode -->
+            <div class="setting-group">
+                <label class="setting-label">Display Mode</label>
+                <div class="btn-toggle-group">
+                    <button class="toggle-btn active" data-mode="slideshow" id="modeSlideBtn">
+                        <i class="ri-slideshow-line"></i> Slideshow
+                    </button>
+                    <button class="toggle-btn" data-mode="grid" id="modeGridBtn">
+                        <i class="ri-grid-line"></i> Multi-Grid
+                    </button>
+                </div>
+            </div>
+
+            <!-- Image Fit -->
+            <div class="setting-group">
+                <label class="setting-label">Image Scaling</label>
+                <div class="btn-toggle-group">
+                    <button class="toggle-btn active" data-fit="contain" id="fitContainBtn">
+                        Fit 16:9 (Contain)
+                    </button>
+                    <button class="toggle-btn" data-fit="cover" id="fitCoverBtn">
+                        Fill Screen (Cover)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Slide Duration -->
+            <div class="setting-group">
+                <label class="setting-label">Slide Interval</label>
+                <div class="btn-toggle-group cols-3">
+                    <button class="toggle-btn" data-sec="5">5s</button>
+                    <button class="toggle-btn active" data-sec="10">10s</button>
+                    <button class="toggle-btn" data-sec="20">20s</button>
+                </div>
+            </div>
+
+            <!-- Header Visibility -->
+            <div class="setting-group">
+                <label class="setting-label">Top Header & Clock</label>
+                <div class="btn-toggle-group">
+                    <button class="toggle-btn active" id="btnHeaderShow">Always Show</button>
+                    <button class="toggle-btn" id="btnHeaderHide">Hide (Clean TV)</button>
+                </div>
+            </div>
+
+            <!-- Sheet Sync Status & URL -->
+            <div class="setting-group">
+                <label class="setting-label">Sheet Sync Frequency</label>
+                <select class="setting-input" id="syncFrequencySelect">
+                    <option value="15000">Every 15 Seconds</option>
+                    <option value="30000" selected>Every 30 Seconds</option>
+                    <option value="60000">Every 1 Minute</option>
+                    <option value="300000">Every 5 Minutes</option>
+                </select>
+            </div>
+
+            <!-- TV Remote Shortcuts Hint -->
+            <div class="shortcuts-hint">
+                <strong>TV / Keyboard Shortcuts:</strong><br>
+                • <kbd>F</kbd> : Fullscreen Mode<br>
+                • <kbd>Space</kbd> / <kbd>→</kbd> : Next Slide<br>
+                • <kbd>←</kbd> : Previous Slide<br>
+                • <kbd>H</kbd> : Toggle Header/Clock<br>
+                • <kbd>R</kbd> : Refresh Sheet Data<br>
+                • <kbd>S</kbd> : Open Settings
+            </div>
+        </aside>
+
+        <!-- Notification Toast -->
+        <div class="tv-toast" id="tvToast">
+            <i class="ri-information-line" style="color: var(--neon-blue);"></i>
+            <span id="toastMessage">Notification</span>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        (function () {
+            'use strict';
+
+            // Google Sheet Configurations
+            const SHEET_ID = '15hQV9i8Ysgqm42zIQ79olqHTqWKFzAFyKM-BIQMedy8';
+
+            // State management
+            const state = {
+                items: [],
+                currentIndex: 0,
+                displayMode: 'slideshow', // 'slideshow' | 'grid'
+                fitMode: 'contain', // 'contain' | 'cover'
+                intervalSec: 10,
+                isAutoPlay: true,
+                headerVisible: true,
+                syncIntervalMs: 30000,
+                lastSyncTime: null,
+                timer: null,
+                progressTimer: null,
+                syncTimer: null,
+                cursorTimer: null,
+                progressStartTime: 0
+            };
+
+            // DOM Elements
+            const dom = {
+                body: document.body,
+                dmbScreen: document.getElementById('dmbScreen'),
+                dmbHeader: document.getElementById('dmbHeader'),
+                dmbMain: document.getElementById('dmbMain'),
+                displayStoreTitle: document.getElementById('displayStoreTitle'),
+                liveStatusText: document.getElementById('liveStatusText'),
+                clockTime: document.getElementById('clockTime'),
+                clockAmPm: document.getElementById('clockAmPm'),
+                clockDate: document.getElementById('clockDate'),
+                slideshowContainer: document.getElementById('slideshowContainer'),
+                gridContainer: document.getElementById('gridContainer'),
+                progressBar: document.getElementById('progressBar'),
+                progressBarContainer: document.getElementById('progressBarContainer'),
+                loaderOverlay: document.getElementById('loaderOverlay'),
+                loaderTitle: document.getElementById('loaderTitle'),
+                loaderDesc: document.getElementById('loaderDesc'),
+                btnRetryFetch: document.getElementById('btnRetryFetch'),
+                settingsPanel: document.getElementById('settingsPanel'),
+                btnSettings: document.getElementById('btnSettings'),
+                btnCloseSettings: document.getElementById('btnCloseSettings'),
+                btnFullscreen: document.getElementById('btnFullscreen'),
+                fsIcon: document.getElementById('fsIcon'),
+                btnRefresh: document.getElementById('btnRefresh'),
+                prevSlideBtn: document.getElementById('prevSlideBtn'),
+                nextSlideBtn: document.getElementById('nextSlideBtn'),
+                modeSlideBtn: document.getElementById('modeSlideBtn'),
+                modeGridBtn: document.getElementById('modeGridBtn'),
+                fitContainBtn: document.getElementById('fitContainBtn'),
+                fitCoverBtn: document.getElementById('fitCoverBtn'),
+                btnHeaderShow: document.getElementById('btnHeaderShow'),
+                btnHeaderHide: document.getElementById('btnHeaderHide'),
+                syncFrequencySelect: document.getElementById('syncFrequencySelect'),
+                tvToast: document.getElementById('tvToast'),
+                toastMessage: document.getElementById('toastMessage')
+            };
+
+            /* ==========================================================================
+               1. URL & Multi-Tier Google Drive Image Direct Formatter
+               ========================================================================== */
+            function extractDriveId(url) {
+                if (!url) return null;
+                // Matches drive.google.com/file/d/FILE_ID/view...
+                const fileMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/i);
+                if (fileMatch && fileMatch[1]) return fileMatch[1];
+
+                // Matches drive.google.com/open?id=FILE_ID or uc?id=FILE_ID
+                const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/i);
+                if (idMatch && idMatch[1]) return idMatch[1];
+
+                // Matches lh3.googleusercontent.com/d/FILE_ID
+                const lh3Match = url.match(/googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/i);
+                if (lh3Match && lh3Match[1]) return lh3Match[1];
+
+                return null;
+            }
+
+            function getDriveImageUrls(driveId) {
+                return [
+                    `https://drive.google.com/thumbnail?id=${driveId}&sz=w2560`, // High-res direct preview CDN (Best for TV)
+                    `https://lh3.googleusercontent.com/d/${driveId}`,           // Google User Content stream
+                    `https://drive.google.com/uc?export=view&id=${driveId}`     // Standard direct view
+                ];
+            }
+
+            function transformImageUrl(rawUrl) {
+                if (!rawUrl) return { primary: '', fallbackList: [], isDrive: false };
+                const url = rawUrl.trim();
+
+                const driveId = extractDriveId(url);
+                if (driveId) {
+                    const driveUrls = getDriveImageUrls(driveId);
+                    return {
+                        primary: driveUrls[0],
+                        fallbackList: driveUrls.slice(1),
+                        isDrive: true,
+                        driveId: driveId
+                    };
+                }
+
+                // Dropbox share links
+                if (url.includes('dropbox.com')) {
+                    const cleanUrl = url.replace('www.dropbox.com', 'dl.dropboxusercontent.com').replace('?dl=0', '');
+                    return { primary: cleanUrl, fallbackList: [], isDrive: false };
+                }
+
+                // Direct web image
+                return { primary: url, fallbackList: [], isDrive: false };
+            }
+
+            /* ==========================================================================
+               2. Google Sheets Data Fetcher (Bypasses CORS via JSONP + Multiple Fallbacks)
+               ========================================================================== */
+            function fetchSheetData() {
+                dom.liveStatusText.textContent = "Syncing...";
+
+                // Method 1: JSONP via script tag (Bypasses all browser CORS restrictions)
+                fetchViaJsonp()
+                    .catch(err => {
+                        console.warn("JSONP failed, trying OpenSheet API...", err);
+                        return fetchViaOpenSheet();
+                    })
+                    .catch(err => {
+                        console.warn("OpenSheet failed, trying AllOrigins proxy...", err);
+                        return fetchViaAllOrigins();
+                    })
+                    .catch(err => {
+                        console.error("All fetch methods failed:", err);
+                        if (state.items.length === 0) {
+                            showErrorState("Could not connect to Google Sheet. Please verify that the sheet is shared as 'Anyone with the link can view'.");
+                        } else {
+                            showToast("Could not update live data; using cached menu.", 4000);
+                            dom.liveStatusText.textContent = "Live Synced";
+                        }
+                    });
+            }
+
+            // Method 1: JSONP Callback Fetcher
+            function fetchViaJsonp() {
+                return new Promise((resolve, reject) => {
+                    const callbackName = 'gvizCallback_' + Math.floor(Math.random() * 1000000);
+                    const script = document.createElement('script');
+                    let isResolved = false;
+
+                    const cleanup = () => {
+                        delete window[callbackName];
+                        if (script.parentNode) script.parentNode.removeChild(script);
+                    };
+
+                    window[callbackName] = function (response) {
+                        isResolved = true;
+                        cleanup();
+                        if (response && response.table) {
+                            const items = parseGvizRows(response.table.cols, response.table.rows);
+                            if (items.length > 0) {
+                                handleDataLoaded(items);
+                                resolve(items);
+                                return;
+                            }
+                        }
+                        reject(new Error("No rows found in GViz response"));
+                    };
+
+                    script.onerror = function () {
+                        cleanup();
+                        if (!isResolved) reject(new Error("JSONP script load error"));
+                    };
+
+                    // Timeout after 8 seconds
+                    setTimeout(() => {
+                        if (!isResolved) {
+                            cleanup();
+                            reject(new Error("JSONP request timed out"));
+                        }
+                    }, 8000);
+
+                    script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=responseHandler:${callbackName}&_t=${Date.now()}`;
+                    document.body.appendChild(script);
+                });
+            }
+
+            // Method 2: OpenSheet API Fallback
+            async function fetchViaOpenSheet() {
+                const res = await fetch(`https://opensheet.elk.sh/${SHEET_ID}/1`);
+                if (!res.ok) throw new Error("OpenSheet error: " + res.status);
+                const data = await res.json();
+                if (!Array.isArray(data) || data.length === 0) throw new Error("No data in OpenSheet response");
+
+                const results = [];
+                data.forEach(row => {
+                    let storeVal = 'Digital Menu Board';
+                    let imgVal = '';
+
+                    for (const [key, val] of Object.entries(row)) {
+                        const cleanKey = key.toLowerCase();
+                        if (cleanKey.includes('image') || cleanKey.includes('img') || cleanKey.includes('photo') || cleanKey.includes('link')) {
+                            imgVal = String(val || '').trim();
+                        } else if (cleanKey.includes('store') || cleanKey.includes('name') || cleanKey.includes('title')) {
+                            storeVal = String(val || '').trim();
+                        }
+                    }
+
+                    if (imgVal) {
+                        const imgData = transformImageUrl(imgVal);
+                        results.push({
+                            store: storeVal || 'Store Menu',
+                            rawImage: imgVal,
+                            image: imgData.primary,
+                            fallbacks: imgData.fallbackList
+                        });
+                    }
+                });
+
+                if (results.length > 0) {
+                    handleDataLoaded(results);
+                    return results;
+                }
+                throw new Error("No valid rows parsed from OpenSheet");
+            }
+
+            // Method 3: AllOrigins CORS Proxy Fallback
+            async function fetchViaAllOrigins() {
+                const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&_t=${Date.now()}`;
+                const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(csvUrl)}`);
+                if (!res.ok) throw new Error("AllOrigins error: " + res.status);
+                const csvText = await res.text();
+                const items = parseCsvRows(csvText);
+                if (items.length > 0) {
+                    handleDataLoaded(items);
+                    return items;
+                }
+                throw new Error("No items parsed from CSV fallback");
+            }
+
+            function parseGvizRows(cols, rows) {
+                const results = [];
+                let storeIdx = 0;
+                let imageIdx = 1;
+
+                cols.forEach((col, idx) => {
+                    const label = (col.label || col.id || '').toLowerCase();
+                    if (label.includes('image') || label.includes('img') || label.includes('photo') || label.includes('link')) {
+                        imageIdx = idx;
+                    } else if (label.includes('store') || label.includes('name') || label.includes('title')) {
+                        storeIdx = idx;
+                    }
+                });
+
+                rows.forEach(r => {
+                    if (!r.c) return;
+                    const storeVal = r.c[storeIdx] && r.c[storeIdx].v ? String(r.c[storeIdx].v).trim() : 'Digital Menu Board';
+                    const imageVal = r.c[imageIdx] && r.c[imageIdx].v ? String(r.c[imageIdx].v).trim() : '';
+
+                    if (imageVal && imageVal !== 'Image' && imageVal !== '') {
+                        const imgData = transformImageUrl(imageVal);
+                        results.push({
+                            store: storeVal || 'Store Menu',
+                            rawImage: imageVal,
+                            image: imgData.primary,
+                            fallbacks: imgData.fallbackList
+                        });
+                    }
+                });
+
+                return results;
+            }
+
+            function parseCsvRows(csvText) {
+                const lines = csvText.split(/\r?\n/).filter(line => line.trim().length > 0);
+                if (lines.length < 2) return [];
+
+                const results = [];
+                const headerLine = lines[0];
+                const headers = parseCsvLine(headerLine);
+                let storeIdx = 0;
+                let imageIdx = 1;
+
+                headers.forEach((h, idx) => {
+                    const headerClean = h.toLowerCase();
+                    if (headerClean.includes('image') || headerClean.includes('img') || headerClean.includes('photo')) {
+                        imageIdx = idx;
+                    } else if (headerClean.includes('store') || headerClean.includes('name')) {
+                        storeIdx = idx;
+                    }
+                });
+
+                for (let i = 1; i < lines.length; i++) {
+                    const cols = parseCsvLine(lines[i]);
+                    if (cols.length > imageIdx) {
+                        const storeVal = cols[storeIdx] || 'Digital Menu Board';
+                        const imgVal = cols[imageIdx] || '';
+                        if (imgVal) {
+                            const imgData = transformImageUrl(imgVal);
+                            results.push({
+                                store: storeVal,
+                                rawImage: imgVal,
+                                image: imgData.primary,
+                                fallbacks: imgData.fallbackList
+                            });
+                        }
+                    }
+                }
+
+                return results;
+            }
+
+            function parseCsvLine(line) {
+                const result = [];
+                let insideQuotes = false;
+                let current = '';
+
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    if (char === '"') {
+                        insideQuotes = !insideQuotes;
+                    } else if (char === ',' && !insideQuotes) {
+                        result.push(current.trim().replace(/^"|"$/g, ''));
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                result.push(current.trim().replace(/^"|"$/g, ''));
+                return result;
+            }
+
+            function handleDataLoaded(newItems) {
+                const isChanged = JSON.stringify(state.items) !== JSON.stringify(newItems);
+                state.items = newItems;
+                state.lastSyncTime = new Date();
+
+                dom.loaderOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    dom.loaderOverlay.style.display = 'none';
+                }, 500);
+
+                dom.liveStatusText.textContent = `Live (${state.items.length} Boards)`;
+                
+                if (isChanged || state.currentIndex >= state.items.length) {
+                    state.currentIndex = 0;
+                    renderDisplay();
+                    startSlideshowTimer();
+                    showToast(`Loaded ${state.items.length} menu board(s) successfully!`);
+                }
+            }
+
+            function showErrorState(msg) {
+                dom.loaderOverlay.style.display = 'flex';
+                dom.loaderOverlay.style.opacity = '1';
+                dom.loaderTitle.textContent = "Display Notice";
+                dom.loaderDesc.textContent = msg;
+                dom.btnRetryFetch.style.display = 'inline-flex';
+                dom.liveStatusText.textContent = "Connection Error";
+            }
+
+            /* ==========================================================================
+               3. Rendering Engine: 16:9 TV Slideshow & Multi-Grid Views
+               ========================================================================== */
+            function renderDisplay() {
+                if (state.items.length === 0) return;
+
+                if (state.displayMode === 'slideshow') {
+                    renderSlideshow();
+                } else {
+                    renderGrid();
+                }
+            }
+
+            function attachImageFallbackHandler(imgElement, item) {
+                let fallbackIndex = 0;
+                imgElement.onerror = function () {
+                    if (item.fallbacks && fallbackIndex < item.fallbacks.length) {
+                        const nextFallback = item.fallbacks[fallbackIndex++];
+                        console.log('Trying next fallback image URL:', nextFallback);
+                        this.src = nextFallback;
+                    } else {
+                        console.warn('All image fallbacks failed for item:', item);
+                        this.onerror = null;
+                        this.src = createSvgPlaceholder(item.store, item.rawImage);
+                    }
+                };
+            }
+
+            function renderSlideshow() {
+                dom.slideshowContainer.style.display = 'flex';
+                dom.gridContainer.style.display = 'none';
+                dom.progressBarContainer.style.display = state.items.length > 1 ? 'block' : 'none';
+                dom.prevSlideBtn.style.display = state.items.length > 1 ? 'flex' : 'none';
+                dom.nextSlideBtn.style.display = state.items.length > 1 ? 'flex' : 'none';
+
+                dom.slideshowContainer.innerHTML = '';
+
+                state.items.forEach((item, index) => {
+                    const slideDiv = document.createElement('div');
+                    slideDiv.className = `slide-item ${index === state.currentIndex ? 'active' : ''} ${state.fitMode === 'cover' ? 'fit-cover' : ''}`;
+                    slideDiv.id = `slide-${index}`;
+
+                    const img = document.createElement('img');
+                    img.className = 'slide-image';
+                    img.src = item.image;
+                    img.alt = item.store || `Menu Display ${index + 1}`;
+                    img.loading = 'eager';
+
+                    attachImageFallbackHandler(img, item);
+
+                    const caption = document.createElement('div');
+                    caption.className = 'slide-caption-badge';
+                    caption.innerHTML = `
+                        <i class="ri-store-2-fill" style="color: var(--accent); font-size: 1.4rem;"></i>
+                        <span class="slide-store-name">${escapeHtml(item.store)}</span>
+                        ${state.items.length > 1 ? `<span class="slide-counter">${index + 1} / ${state.items.length}</span>` : ''}
+                    `;
+
+                    slideDiv.appendChild(img);
+                    slideDiv.appendChild(caption);
+                    dom.slideshowContainer.appendChild(slideDiv);
+                });
+
+                const currentItem = state.items[state.currentIndex] || state.items[0];
+                dom.displayStoreTitle.innerHTML = `<span>${escapeHtml(currentItem.store)}</span>`;
+            }
+
+            function renderGrid() {
+                dom.slideshowContainer.style.display = 'none';
+                dom.gridContainer.style.display = 'grid';
+                dom.progressBarContainer.style.display = 'none';
+                dom.prevSlideBtn.style.display = 'none';
+                dom.nextSlideBtn.style.display = 'none';
+
+                dom.gridContainer.className = 'grid-container';
+                if (state.items.length === 1) dom.gridContainer.classList.add('grid-1');
+                else if (state.items.length === 2) dom.gridContainer.classList.add('grid-2');
+                else if (state.items.length === 3) dom.gridContainer.classList.add('grid-3');
+                else if (state.items.length === 4) dom.gridContainer.classList.add('grid-4');
+                else dom.gridContainer.classList.add('grid-many');
+
+                dom.gridContainer.innerHTML = '';
+
+                state.items.forEach((item, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'grid-card';
+
+                    const imgWrap = document.createElement('div');
+                    imgWrap.className = 'grid-card-img-wrap';
+
+                    const img = document.createElement('img');
+                    img.src = item.image;
+                    img.alt = item.store;
+                    attachImageFallbackHandler(img, item);
+
+                    const footer = document.createElement('div');
+                    footer.className = 'grid-card-footer';
+                    footer.innerHTML = `
+                        <div class="grid-card-title">${escapeHtml(item.store)}</div>
+                        <span class="slide-counter">#${index + 1}</span>
+                    `;
+
+                    imgWrap.appendChild(img);
+                    card.appendChild(imgWrap);
+                    card.appendChild(footer);
+                    dom.gridContainer.appendChild(card);
+                });
+
+                dom.displayStoreTitle.innerHTML = `<span>All Menu Boards (${state.items.length})</span>`;
+            }
+
+            function createSvgPlaceholder(storeName, urlSnippet) {
+                const name = storeName || "Menu Board";
+                const isGoogleDrive = urlSnippet && (urlSnippet.includes('googleusercontent') || urlSnippet.includes('drive.google.com'));
+                const hint = isGoogleDrive ? "Ensure Google Drive image permission is 'Anyone with link can view'" : "Verify Image URL in Google Sheet";
+                
+                const svg = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" style="background:#111520;">
+                    <defs>
+                        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#ff5722;stop-opacity:0.2" />
+                            <stop offset="100%" style="stop-color:#00d2ff;stop-opacity:0.2" />
+                        </linearGradient>
+                    </defs>
+                    <rect width="100%" height="100%" fill="url(#grad)" />
+                    <circle cx="960" cy="460" r="90" fill="rgba(255,87,34,0.15)" stroke="#ff5722" stroke-width="4"/>
+                    <path d="M960 410 v70 M960 510 v10" stroke="#ff5722" stroke-width="8" stroke-linecap="round"/>
+                    <text x="960" y="600" fill="#ffffff" font-family="'Plus Jakarta Sans', sans-serif" font-size="44" font-weight="bold" text-anchor="middle">${escapeXml(name)}</text>
+                    <text x="960" y="660" fill="#94a3b8" font-family="'Plus Jakarta Sans', sans-serif" font-size="26" text-anchor="middle">Image is syncing or requires public access</text>
+                    <text x="960" y="710" fill="#ff9800" font-family="'Plus Jakarta Sans', sans-serif" font-size="22" text-anchor="middle">${escapeXml(hint)}</text>
+                </svg>`;
+                return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+            }
+
+            /* ==========================================================================
+               4. Slideshow Controls & Progress Bar Animation
+               ========================================================================== */
+            function goToSlide(index) {
+                if (state.items.length <= 1) return;
+                
+                const prevSlide = document.getElementById(`slide-${state.currentIndex}`);
+                if (prevSlide) prevSlide.classList.remove('active');
+
+                state.currentIndex = (index + state.items.length) % state.items.length;
+
+                const nextSlide = document.getElementById(`slide-${state.currentIndex}`);
+                if (nextSlide) nextSlide.classList.add('active');
+
+                const currentItem = state.items[state.currentIndex];
+                if (currentItem) {
+                    dom.displayStoreTitle.innerHTML = `<span>${escapeHtml(currentItem.store)}</span>`;
+                }
+
+                resetSlideTimer();
+            }
+
+            function nextSlide() {
+                goToSlide(state.currentIndex + 1);
+            }
+
+            function prevSlide() {
+                goToSlide(state.currentIndex - 1);
+            }
+
+            function startSlideshowTimer() {
+                if (state.items.length <= 1 || state.displayMode !== 'slideshow') {
+                    dom.progressBar.style.width = '0%';
+                    return;
+                }
+
+                clearInterval(state.timer);
+                clearInterval(state.progressTimer);
+
+                state.progressStartTime = Date.now();
+                const totalDuration = state.intervalSec * 1000;
+
+                state.progressTimer = setInterval(() => {
+                    const elapsed = Date.now() - state.progressStartTime;
+                    const percent = Math.min(100, (elapsed / totalDuration) * 100);
+                    dom.progressBar.style.width = `${percent}%`;
+
+                    if (elapsed >= totalDuration) {
+                        clearInterval(state.progressTimer);
+                        nextSlide();
+                    }
+                }, 50);
+            }
+
+            function resetSlideTimer() {
+                startSlideshowTimer();
+            }
+
+            /* ==========================================================================
+               5. Digital Clock for 43" TV Header
+               ========================================================================== */
+            function updateDigitalClock() {
+                const now = new Date();
+                let hours = now.getHours();
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                const formattedHours = String(hours).padStart(2, '0');
+
+                dom.clockTime.textContent = `${formattedHours}:${minutes}:${seconds}`;
+                dom.clockAmPm.textContent = ampm;
+
+                const options = { weekday: 'short', month: 'short', day: 'numeric' };
+                dom.clockDate.textContent = now.toLocaleDateString('en-US', options);
+            }
+
+            /* ==========================================================================
+               6. TV Kiosk Cursor Auto-Hide & Fullscreen Handling
+               ========================================================================== */
+            function setupCursorAutoHide() {
+                function resetCursor() {
+                    dom.body.classList.remove('hide-cursor');
+                    clearTimeout(state.cursorTimer);
+                    state.cursorTimer = setTimeout(() => {
+                        dom.body.classList.add('hide-cursor');
+                    }, 3000);
+                }
+
+                window.addEventListener('mousemove', resetCursor);
+                window.addEventListener('mousedown', resetCursor);
+                window.addEventListener('keydown', resetCursor);
+                resetCursor();
+            }
+
+            function toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().then(() => {
+                        dom.fsIcon.className = 'ri-fullscreen-exit-line';
+                        showToast('TV Fullscreen Mode Active');
+                    }).catch(err => {
+                        console.error('Error enabling fullscreen:', err);
+                    });
+                } else {
+                    document.exitFullscreen().then(() => {
+                        dom.fsIcon.className = 'ri-fullscreen-line';
+                    });
+                }
+            }
+
+            /* ==========================================================================
+               7. Notifications & Helpers
+               ========================================================================== */
+            function showToast(message, duration = 3000) {
+                dom.toastMessage.textContent = message;
+                dom.tvToast.classList.add('show');
+                setTimeout(() => {
+                    dom.tvToast.classList.remove('show');
+                }, duration);
+            }
+
+            function escapeHtml(str) {
+                if (!str) return '';
+                return str.replace(/&/g, '&amp;')
+                          .replace(/</g, '&lt;')
+                          .replace(/>/g, '&gt;')
+                          .replace(/"/g, '&quot;')
+                          .replace(/'/g, '&#039;');
+            }
+
+            function escapeXml(str) {
+                if (!str) return '';
+                return str.replace(/&/g, '&amp;')
+                          .replace(/</g, '&lt;')
+                          .replace(/>/g, '&gt;')
+                          .replace(/"/g, '&quot;')
+                          .replace(/'/g, '&apos;');
+            }
+
+            /* ==========================================================================
+               8. Event Listeners & TV Remote Controls
+               ========================================================================== */
+            function bindEvents() {
+                // Navigation buttons
+                dom.nextSlideBtn.addEventListener('click', nextSlide);
+                dom.prevSlideBtn.addEventListener('click', prevSlide);
+
+                // Fullscreen button
+                dom.btnFullscreen.addEventListener('click', toggleFullscreen);
+
+                // Manual refresh button
+                dom.btnRefresh.addEventListener('click', () => {
+                    showToast('Syncing with Google Sheets...');
+                    fetchSheetData();
+                });
+
+                dom.btnRetryFetch.addEventListener('click', () => {
+                    dom.btnRetryFetch.style.display = 'none';
+                    dom.loaderTitle.textContent = "Connecting to Google Sheet...";
+                    fetchSheetData();
+                });
+
+                // Settings modal controls
+                dom.btnSettings.addEventListener('click', () => {
+                    dom.settingsPanel.classList.toggle('open');
+                });
+
+                dom.btnCloseSettings.addEventListener('click', () => {
+                    dom.settingsPanel.classList.remove('open');
+                });
+
+                // Close settings when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!dom.settingsPanel.contains(e.target) && !dom.btnSettings.contains(e.target)) {
+                        dom.settingsPanel.classList.remove('open');
+                    }
+                });
+
+                // Mode toggle (Slideshow vs Grid)
+                dom.modeSlideBtn.addEventListener('click', () => {
+                    state.displayMode = 'slideshow';
+                    dom.modeSlideBtn.classList.add('active');
+                    dom.modeGridBtn.classList.remove('active');
+                    renderDisplay();
+                    startSlideshowTimer();
+                });
+
+                dom.modeGridBtn.addEventListener('click', () => {
+                    state.displayMode = 'grid';
+                    dom.modeGridBtn.classList.add('active');
+                    dom.modeSlideBtn.classList.remove('active');
+                    clearInterval(state.timer);
+                    clearInterval(state.progressTimer);
+                    renderDisplay();
+                });
+
+                // Image Fit toggle (Contain vs Cover)
+                dom.fitContainBtn.addEventListener('click', () => {
+                    state.fitMode = 'contain';
+                    dom.fitContainBtn.classList.add('active');
+                    dom.fitCoverBtn.classList.remove('active');
+                    renderDisplay();
+                });
+
+                dom.fitCoverBtn.addEventListener('click', () => {
+                    state.fitMode = 'cover';
+                    dom.fitCoverBtn.classList.add('active');
+                    dom.fitCoverBtn.classList.remove('active');
+                    renderDisplay();
+                });
+
+                // Interval timing toggle
+                document.querySelectorAll('[data-sec]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('[data-sec]').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        state.intervalSec = parseInt(e.target.dataset.sec, 10);
+                        resetSlideTimer();
+                        showToast(`Slide interval set to ${state.intervalSec}s`);
+                    });
+                });
+
+                // Header visibility toggle
+                dom.btnHeaderShow.addEventListener('click', () => {
+                    state.headerVisible = true;
+                    dom.dmbHeader.classList.remove('hidden');
+                    dom.dmbMain.classList.remove('full-viewport');
+                    dom.btnHeaderShow.classList.add('active');
+                    dom.btnHeaderHide.classList.remove('active');
+                });
+
+                dom.btnHeaderHide.addEventListener('click', () => {
+                    state.headerVisible = false;
+                    dom.dmbHeader.classList.add('hidden');
+                    dom.dmbMain.classList.add('full-viewport');
+                    dom.btnHeaderHide.classList.add('active');
+                    dom.btnHeaderShow.classList.remove('active');
+                    showToast('Header hidden. Press H to restore.');
+                });
+
+                // Sheet sync frequency change
+                dom.syncFrequencySelect.addEventListener('change', (e) => {
+                    state.syncIntervalMs = parseInt(e.target.value, 10);
+                    clearInterval(state.syncTimer);
+                    state.syncTimer = setInterval(fetchSheetData, state.syncIntervalMs);
+                    showToast(`Sync interval: ${state.syncIntervalMs / 1000}s`);
+                });
+
+                // TV Remote & Keyboard Shortcuts
+                window.addEventListener('keydown', (e) => {
+                    switch (e.key) {
+                        case 'ArrowRight':
+                        case ' ':
+                        case 'Enter':
+                            nextSlide();
+                            break;
+                        case 'ArrowLeft':
+                            prevSlide();
+                            break;
+                        case 'f':
+                        case 'F':
+                            toggleFullscreen();
+                            break;
+                        case 'h':
+                        case 'H':
+                            if (state.headerVisible) {
+                                dom.btnHeaderHide.click();
+                            } else {
+                                dom.btnHeaderShow.click();
+                            }
+                            break;
+                        case 'r':
+                        case 'R':
+                            fetchSheetData();
+                            break;
+                        case 's':
+                        case 'S':
+                            dom.settingsPanel.classList.toggle('open');
+                            break;
+                        case 'Escape':
+                            dom.settingsPanel.classList.remove('open');
+                            break;
+                    }
+                });
+            }
+
+            /* ==========================================================================
+               9. Initialization
+               ========================================================================== */
+            function init() {
+                bindEvents();
+                setupCursorAutoHide();
+                updateDigitalClock();
+                setInterval(updateDigitalClock, 1000);
+
+                // Initial fetch
+                fetchSheetData();
+
+                // Periodic auto-sync
+                state.syncTimer = setInterval(fetchSheetData, state.syncIntervalMs);
+            }
+
+            // Start on DOM ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+</html>
