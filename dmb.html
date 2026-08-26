@@ -60,12 +60,12 @@
         .slide-image {
             width: 100vw;
             height: 100vh;
-            object-fit: contain; /* Perfect 16:9 43" TV scale without stretching */
+            object-fit: contain; /* Perfect 16:9 43" TV scale without distortion */
             object-position: center;
             display: block;
         }
 
-        /* Minimal Silent Loader (Hidden immediately once image loads) */
+        /* Minimal Silent Loader */
         .initial-loader {
             position: absolute;
             inset: 0;
@@ -111,11 +111,65 @@
             let items = [];
             let currentIndex = 0;
             let slideTimer = null;
+            let wakeLock = null;
             const container = document.getElementById('dmbScreen');
             const loader = document.getElementById('initialLoader');
 
             /* ==========================================================
-               1. Multi-Tier Google Drive URL Converter
+               1. Auto-Fullscreen & Keep Screen Awake for TV
+               ========================================================== */
+            function requestTvFullscreen() {
+                const docEl = document.documentElement;
+                const reqFs = docEl.requestFullscreen || 
+                              docEl.webkitRequestFullscreen || 
+                              docEl.mozRequestFullScreen || 
+                              docEl.msRequestFullscreen;
+
+                if (!document.fullscreenElement && !document.webkitFullscreenElement && reqFs) {
+                    reqFs.call(docEl).catch(err => {
+                        // Browsers may require user gesture on first load
+                        console.log('Fullscreen pending user interaction:', err);
+                    });
+                }
+            }
+
+            // Keep screen awake (Prevents TV from going to sleep / dimming)
+            async function requestWakeLock() {
+                try {
+                    if ('wakeLock' in navigator) {
+                        wakeLock = await navigator.wakeLock.request('screen');
+                    }
+                } catch (err) {
+                    console.log('WakeLock error:', err);
+                }
+            }
+
+            // Attempt on page load
+            window.addEventListener('load', () => {
+                requestTvFullscreen();
+                requestWakeLock();
+            });
+
+            // Automatically trigger fullscreen on the very first touch / click / remote press anywhere
+            const userInteractionEvents = ['click', 'touchstart', 'keydown', 'mousedown'];
+            function onFirstUserInteraction() {
+                requestTvFullscreen();
+                requestWakeLock();
+            }
+
+            userInteractionEvents.forEach(evt => {
+                window.addEventListener(evt, onFirstUserInteraction, { passive: true });
+            });
+
+            // Re-acquire WakeLock if tab becomes visible again
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    requestWakeLock();
+                }
+            });
+
+            /* ==========================================================
+               2. Multi-Tier Google Drive URL Converter
                ========================================================== */
             function extractDriveId(url) {
                 if (!url) return null;
@@ -163,7 +217,7 @@
             }
 
             /* ==========================================================
-               2. Google Sheets Data Fetcher (JSONP + Proxy Fallbacks)
+               3. Google Sheets Data Fetcher (JSONP + Proxy Fallbacks)
                ========================================================== */
             function fetchSheetData() {
                 fetchViaJsonp()
@@ -256,7 +310,6 @@
                 const results = [];
                 for (let i = 1; i < lines.length; i++) {
                     const parts = lines[i].split(',').map(p => p.trim().replace(/^"|"$/g, ''));
-                    // Look for image url in columns
                     const imgUrl = parts.find(p => p.startsWith('http'));
                     if (imgUrl) {
                         const formatted = formatImageUrl(imgUrl);
@@ -303,7 +356,7 @@
             }
 
             /* ==========================================================
-               3. Seamless Fullscreen Rendering
+               4. Seamless Fullscreen Rendering
                ========================================================== */
             function handleLoadedData(newItems) {
                 const isDiff = JSON.stringify(items.map(i => i.primary)) !== JSON.stringify(newItems.map(i => i.primary));
@@ -323,7 +376,6 @@
             }
 
             function renderSlides() {
-                // Keep loader, clear previous slides
                 const oldSlides = container.querySelectorAll('.slide-item');
                 oldSlides.forEach(s => s.remove());
 
@@ -371,7 +423,7 @@
             }
 
             /* ==========================================================
-               4. TV Remote & Keyboard Navigation
+               5. TV Remote & Keyboard Navigation
                ========================================================== */
             window.addEventListener('keydown', (e) => {
                 if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
@@ -382,21 +434,12 @@
                     startSlideshow();
                 } else if (e.key === 'f' || e.key === 'F') {
                     if (!document.fullscreenElement) {
-                        document.documentElement.requestFullscreen();
+                        requestTvFullscreen();
                     } else {
                         document.exitFullscreen();
                     }
                 } else if (e.key === 'r' || e.key === 'R') {
                     fetchSheetData();
-                }
-            });
-
-            // Double-click to toggle fullscreen
-            window.addEventListener('dblclick', () => {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen();
-                } else {
-                    document.exitFullscreen();
                 }
             });
 
