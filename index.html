@@ -198,9 +198,137 @@
             margin-bottom: 6px;
             font-size: 14px;
         }
+
+        /* ==========================================================
+           ROW / NO SELECTOR (ONLY INPUT BOX)
+           ========================================================== */
+        body.mouse-active,
+        body.modal-open,
+        body.modal-open * {
+            cursor: auto !important;
+        }
+
+        .no-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .no-modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .no-form {
+            width: 100%;
+            max-width: 360px;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .no-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .no-input-field {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            border-radius: 14px;
+            padding: 16px 54px 16px 20px;
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s, transform 0.15s;
+            cursor: text !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .no-input-field:focus {
+            border-color: #ff5722;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 4px rgba(255, 87, 34, 0.3), 0 12px 36px rgba(0, 0, 0, 0.7);
+        }
+
+        .no-input-field::placeholder {
+            color: #777777;
+            font-size: 18px;
+            font-weight: 400;
+        }
+
+        .no-input-field.error {
+            border-color: #ff5252 !important;
+            box-shadow: 0 0 0 4px rgba(255, 82, 82, 0.35) !important;
+            animation: no-shake 0.35s ease;
+        }
+
+        @keyframes no-shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-7px); }
+            40%, 80% { transform: translateX(7px); }
+        }
+
+        .no-submit-btn {
+            position: absolute;
+            right: 8px;
+            background: linear-gradient(135deg, #ff5722, #ff7043);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            width: 42px;
+            height: 42px;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer !important;
+            transition: transform 0.15s, filter 0.15s, box-shadow 0.15s;
+            box-shadow: 0 4px 12px rgba(255, 87, 34, 0.4);
+        }
+
+        .no-submit-btn:hover {
+            filter: brightness(1.15);
+            transform: scale(1.05);
+        }
+
+        .no-submit-btn:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
-<body>
+<body class="modal-open">
+
+    <!-- Row / No Selector (ONLY Input Box) -->
+    <div class="no-modal-overlay active" id="noModal">
+        <form id="noForm" class="no-form" autocomplete="off">
+            <div class="no-input-wrapper">
+                <input 
+                    type="text" 
+                    id="noInput" 
+                    class="no-input-field" 
+                    placeholder="Enter No" 
+                    autofocus
+                >
+                <button type="submit" id="noSubmitBtn" class="no-submit-btn" title="Submit">➔</button>
+            </div>
+        </form>
+    </div>
 
     <div class="dmb-screen" id="dmbScreen">
         <!-- Initial Loader -->
@@ -217,6 +345,8 @@
     <div class="diagnostics-overlay" id="diagOverlay">
         <div class="diag-title">📺 TV Screen Status</div>
         <div>Sheet ID: <span id="diagSheetId" style="color: #64b5f6;"></span></div>
+        <div>Selected Row (No): <span id="diagSelectedNo" style="color: #00e676;">All</span></div>
+        <div>Store Name: <span id="diagStoreName" style="color: #ffd54f;">-</span></div>
         <div>Total Slides: <span id="diagTotalSlides" style="color: #81c784;">0</span></div>
         <div>Active Slide: <span id="diagActiveSlide" style="color: #ffd54f;">-</span></div>
         <div>Current Mode: <span id="diagOrientation" style="color: #ff80ab;">Horizontal</span></div>
@@ -249,6 +379,7 @@
             // LocalStorage cache key for instant display on TV boot
             const CACHE_KEY = `dmb_slides_${SHEET_ID}`;
 
+            let allSheetRows = [];
             let items = [];
             let currentIndex = 0;
             let slideTimer = null;
@@ -258,10 +389,165 @@
             let lastSyncTime = null;
             let diagTimeout = null;
 
+            // Row No selection state
+            let selectedNo = urlParams.get('no') || urlParams.get('row') || '';
+            let savedNo = '';
+            try {
+                savedNo = localStorage.getItem('dmb_selected_no') || '';
+            } catch (e) {}
+            if (!selectedNo && savedNo) {
+                selectedNo = savedNo;
+            }
+
+            let isModalOpen = true;
+            let pendingNoSelection = null;
+
             const container = document.getElementById('dmbScreen');
             const loader = document.getElementById('initialLoader');
             const syncBadge = document.getElementById('syncBadge');
             const diagOverlay = document.getElementById('diagOverlay');
+
+            // Modal & Selector elements
+            const noModal = document.getElementById('noModal');
+            const noForm = document.getElementById('noForm');
+            const noInput = document.getElementById('noInput');
+            const noSubmitBtn = document.getElementById('noSubmitBtn');
+            const diagSelectedNo = document.getElementById('diagSelectedNo');
+            const diagStoreName = document.getElementById('diagStoreName');
+
+            // Kiosk mouse movement detection to reveal controls and cursor
+            let mouseTimer = null;
+            window.addEventListener('mousemove', () => {
+                document.body.classList.add('mouse-active');
+                clearTimeout(mouseTimer);
+                mouseTimer = setTimeout(() => {
+                    if (!isModalOpen) {
+                        document.body.classList.remove('mouse-active');
+                    }
+                }, 3500);
+            });
+
+            /* ==========================================================
+               Row Selection & Input Box Helper Functions
+               ========================================================== */
+            function matchNo(rowNo, targetNo) {
+                if (rowNo === undefined || rowNo === null || targetNo === undefined || targetNo === null) return false;
+                const r = String(rowNo).trim().toLowerCase();
+                const t = String(targetNo).trim().toLowerCase();
+                if (!r || !t) return false;
+                if (r === t) return true;
+
+                // Numerical comparison if applicable (e.g. "1" == "1.0")
+                const numR = parseFloat(r);
+                const numT = parseFloat(t);
+                if (!isNaN(numR) && !isNaN(numT) && numR === numT) return true;
+
+                return false;
+            }
+
+            function showStatus(msg, type = 'info') {
+                if (noInput && type === 'error') {
+                    noInput.classList.add('error');
+                    noInput.value = '';
+                    noInput.placeholder = msg;
+                    setTimeout(() => {
+                        if (noInput) {
+                            noInput.classList.remove('error');
+                            noInput.placeholder = 'Enter No';
+                        }
+                    }, 2200);
+                }
+            }
+
+            function openModal() {
+                isModalOpen = true;
+                document.body.classList.add('modal-open');
+                if (noModal) {
+                    noModal.classList.add('active');
+                }
+                if (noInput) {
+                    if (selectedNo && selectedNo.toUpperCase() !== 'ALL') {
+                        noInput.value = selectedNo;
+                    }
+                    setTimeout(() => {
+                        noInput.focus();
+                        noInput.select();
+                    }, 80);
+                }
+            }
+
+            function closeModal() {
+                isModalOpen = false;
+                document.body.classList.remove('modal-open');
+                if (noModal) {
+                    noModal.classList.remove('active');
+                }
+            }
+
+            function submitRowSelection(val) {
+                const target = String(val || '').trim();
+                if (!target) {
+                    showStatus('Enter a number', 'error');
+                    if (noInput) noInput.focus();
+                    return;
+                }
+
+                if (target.toUpperCase() === 'ALL') {
+                    selectedNo = 'ALL';
+                    try { localStorage.removeItem('dmb_selected_no'); } catch (e) {}
+                    applyFilterAndClose(allSheetRows, 'All');
+                    return;
+                }
+
+                if (!allSheetRows || allSheetRows.length === 0) {
+                    pendingNoSelection = target;
+                    return;
+                }
+
+                const matched = allSheetRows.filter(r => matchNo(r.no, target));
+                if (matched.length === 0) {
+                    showStatus(`No "${target}" not found`, 'error');
+                    if (noInput) noInput.focus();
+                    return;
+                }
+
+                selectedNo = target;
+                try {
+                    localStorage.setItem('dmb_selected_no', target);
+                } catch (e) {}
+
+                applyFilterAndClose(matched, target);
+            }
+
+            function applyFilterAndClose(filteredItems, label) {
+                items = filteredItems;
+                currentIndex = 0;
+                renderSlides();
+                startSlideshow();
+                closeModal();
+                if (loader) {
+                    loader.style.display = 'none';
+                }
+                updateDiagnostics();
+            }
+
+            if (noForm) {
+                noForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    if (noInput) {
+                        submitRowSelection(noInput.value);
+                    }
+                });
+            }
+
+            // Click or tap anywhere on screen to re-open input box anytime
+            if (container) {
+                container.addEventListener('click', () => {
+                    if (!isModalOpen) {
+                        openModal();
+                    }
+                });
+            }
 
             /* ==========================================================
                2. 24/7 TV Screen Wake Lock & Fullscreen
@@ -494,13 +780,19 @@
                 data.forEach(row => {
                     let imgVal = '';
                     let tvVal = '';
+                    let noVal = '';
+                    let storeVal = '';
 
                     for (const [key, val] of Object.entries(row)) {
-                        const k = key.toLowerCase();
-                        const v = String(val || '').trim();
+                        const k = key.toLowerCase().trim();
+                        const v = String(val !== undefined && val !== null ? val : '').trim();
 
                         if (k === 'tv' || k.includes('orient') || k.includes('mode')) {
                             tvVal = v;
+                        } else if (k === 'no' || k === 'no.' || k === 'num' || k.includes('number') || k === 'row') {
+                            noVal = v;
+                        } else if (k.includes('store') || k.includes('name') || k.includes('title')) {
+                            storeVal = v;
                         } else if (k.includes('image') || k.includes('img') || k.includes('photo') || k.includes('link') || k.includes('url')) {
                             imgVal = v;
                         } else if (!imgVal && (v.startsWith('http') || v.includes('drive.google'))) {
@@ -512,7 +804,9 @@
                     if (formatted) {
                         results.push({
                             ...formatted,
-                            orientation: parseOrientationValue(tvVal)
+                            orientation: parseOrientationValue(tvVal),
+                            no: noVal,
+                            store: storeVal
                         });
                     }
                 });
@@ -553,6 +847,8 @@
 
                 let imgColIdx = -1;
                 let tvColIdx = -1;
+                let noColIdx = -1;
+                let storeColIdx = -1;
 
                 cols.forEach((c, idx) => {
                     const label = (c.label || c.id || '').toLowerCase().trim();
@@ -560,6 +856,10 @@
                         tvColIdx = idx;
                     } else if (label.includes('image') || label.includes('img') || label.includes('photo') || label.includes('link') || label.includes('url')) {
                         imgColIdx = idx;
+                    } else if (label === 'no' || label === 'no.' || label === 'num' || label.includes('number') || label === 'row') {
+                        noColIdx = idx;
+                    } else if (label.includes('store') || label.includes('name') || label.includes('title')) {
+                        storeColIdx = idx;
                     }
                 });
 
@@ -568,6 +868,8 @@
 
                     let imgVal = '';
                     let tvVal = '';
+                    let noVal = '';
+                    let storeVal = '';
 
                     if (imgColIdx !== -1 && r.c[imgColIdx]) {
                         imgVal = r.c[imgColIdx].v ? String(r.c[imgColIdx].v).trim() : '';
@@ -575,10 +877,19 @@
                     if (tvColIdx !== -1 && r.c[tvColIdx]) {
                         tvVal = r.c[tvColIdx].v ? String(r.c[tvColIdx].v).trim() : '';
                     }
+                    if (noColIdx !== -1 && r.c[noColIdx]) {
+                        const cell = r.c[noColIdx];
+                        noVal = cell.f !== undefined ? String(cell.f).trim() : (cell.v !== undefined ? String(cell.v).trim() : '');
+                    }
+                    if (storeColIdx !== -1 && r.c[storeColIdx]) {
+                        const cell = r.c[storeColIdx];
+                        storeVal = cell.v !== undefined ? String(cell.v).trim() : '';
+                    }
 
                     // Fallback scan across cells if not mapped by column name
                     if (!imgVal) {
                         for (let i = 0; i < r.c.length; i++) {
+                            if (i === noColIdx) continue;
                             const val = r.c[i] && r.c[i].v ? String(r.c[i].v).trim() : '';
                             if (val.startsWith('http') || val.includes('drive.google') || val.includes('lh3.google')) {
                                 imgVal = val;
@@ -589,6 +900,7 @@
 
                     if (!tvVal) {
                         for (let i = 0; i < r.c.length; i++) {
+                            if (i === noColIdx) continue;
                             const val = r.c[i] && r.c[i].v ? String(r.c[i].v).toLowerCase().trim() : '';
                             if (val === 'vertical' || val === 'horizontal' || val === 'portrait' || val === 'landscape' || val === 'v' || val === 'h') {
                                 tvVal = val;
@@ -601,7 +913,9 @@
                     if (formatted) {
                         results.push({
                             ...formatted,
-                            orientation: parseOrientationValue(tvVal)
+                            orientation: parseOrientationValue(tvVal),
+                            no: noVal,
+                            store: storeVal
                         });
                     }
                 });
@@ -635,10 +949,16 @@
                 const headers = parseCsvLine(lines[0]).map(h => h.toLowerCase().trim());
                 let imgColIdx = -1;
                 let tvColIdx = -1;
+                let noColIdx = -1;
+                let storeColIdx = -1;
 
                 headers.forEach((h, idx) => {
                     if (h === 'tv' || h.includes('orient') || h.includes('mode') || h.includes('layout')) {
                         tvColIdx = idx;
+                    } else if (h === 'no' || h === 'no.' || h === 'num' || h.includes('number') || h === 'row') {
+                        noColIdx = idx;
+                    } else if (h.includes('store') || h.includes('name') || h.includes('title')) {
+                        storeColIdx = idx;
                     } else if (h.includes('image') || h.includes('img') || h.includes('photo') || h.includes('link') || h.includes('url')) {
                         imgColIdx = idx;
                     }
@@ -651,12 +971,15 @@
 
                     let imgVal = imgColIdx !== -1 ? row[imgColIdx] : '';
                     let tvVal = tvColIdx !== -1 ? row[tvColIdx] : '';
+                    let noVal = noColIdx !== -1 ? row[noColIdx] : '';
+                    let storeVal = storeColIdx !== -1 ? row[storeColIdx] : '';
 
                     if (!imgVal) {
-                        imgVal = row.find(c => c.startsWith('http') || c.includes('drive.google') || c.includes('lh3.google')) || '';
+                        imgVal = row.find((c, idx) => idx !== noColIdx && (c.startsWith('http') || c.includes('drive.google') || c.includes('lh3.google'))) || '';
                     }
                     if (!tvVal) {
-                        tvVal = row.find(c => {
+                        tvVal = row.find((c, idx) => {
+                            if (idx === noColIdx) return false;
                             const lc = c.toLowerCase();
                             return lc === 'vertical' || lc === 'horizontal' || lc === 'portrait' || lc === 'landscape' || lc === 'v' || lc === 'h';
                         }) || '';
@@ -666,7 +989,9 @@
                     if (formatted) {
                         results.push({
                             ...formatted,
-                            orientation: parseOrientationValue(tvVal)
+                            orientation: parseOrientationValue(tvVal),
+                            no: noVal.trim(),
+                            store: storeVal.trim()
                         });
                     }
                 }
@@ -688,28 +1013,56 @@
             }
 
             async function handleLoadedData(newItems) {
-                // Signature check including both Image URL and TV orientation (horizontal/vertical)
-                const currentSign = items.map(i => `${i.primary}::${i.orientation}`).join('|');
-                const newSign = newItems.map(i => `${i.primary}::${i.orientation}`).join('|');
-                const isDifferent = currentSign !== newSign;
+                allSheetRows = newItems;
 
                 try {
                     localStorage.setItem(CACHE_KEY, JSON.stringify(newItems));
                 } catch (e) {}
 
-                if (isDifferent) {
-                    console.log('Detected Live Update from Sheet:', newItems);
+                if (pendingNoSelection) {
+                    const pending = pendingNoSelection;
+                    pendingNoSelection = null;
+                    submitRowSelection(pending);
+                    return;
+                }
 
-                    if (newItems.length > 0) {
-                        await preloadImage(newItems[0].primary);
+                // If modal is open and user hasn't selected a row yet, wait for user input
+                if (isModalOpen && !selectedNo) {
+                    if (loader) loader.style.display = 'none';
+                    return;
+                }
+
+                let activeRows = allSheetRows;
+                if (selectedNo && selectedNo.toUpperCase() !== 'ALL') {
+                    const matched = allSheetRows.filter(r => matchNo(r.no, selectedNo));
+                    if (matched.length > 0) {
+                        activeRows = matched;
+                    } else {
+                        console.warn(`Selected No ${selectedNo} not found in updated sheet`);
+                        openModal();
+                        showStatus(`No "${selectedNo}" not found`, 'error');
+                        return;
+                    }
+                }
+
+                // Signature check including image, orientation, and row No
+                const currentSign = items.map(i => `${i.primary}::${i.orientation}::${i.no}`).join('|');
+                const newSign = activeRows.map(i => `${i.primary}::${i.orientation}::${i.no}`).join('|');
+                const isDifferent = currentSign !== newSign;
+
+                if (isDifferent) {
+                    console.log('Live Update for Row:', selectedNo || 'All', activeRows);
+
+                    if (activeRows.length > 0) {
+                        await preloadImage(activeRows[0].primary);
                     }
 
-                    items = newItems;
+                    items = activeRows;
                     renderSlides();
                     startSlideshow();
                 }
 
-                if (loader && loader.style.display !== 'none') {
+                if (loader && loader.style.display !== 'none' && !isModalOpen) {
                     loader.style.opacity = '0';
                     setTimeout(() => {
                         loader.style.display = 'none';
@@ -802,10 +1155,14 @@
                 const dSlide = document.getElementById('diagSlideTime');
                 const dLast = document.getElementById('diagLastSync');
                 const dStatus = document.getElementById('diagStatus');
+                const dSelNo = document.getElementById('diagSelectedNo');
+                const dStore = document.getElementById('diagStoreName');
 
                 const currentItem = items[currentIndex];
 
                 if (dSheet) dSheet.textContent = SHEET_ID.substring(0, 14) + '...';
+                if (dSelNo) dSelNo.textContent = selectedNo || 'All';
+                if (dStore) dStore.textContent = currentItem && currentItem.store ? currentItem.store : (items[0] && items[0].store ? items[0].store : '-');
                 if (dTotal) dTotal.textContent = items.length;
                 if (dActive) dActive.textContent = items.length > 0 ? `${currentIndex + 1} of ${items.length}` : '-';
                 if (dOrient) {
@@ -845,9 +1202,22 @@
                8. TV Remote & Keyboard Controls
                ========================================================== */
             window.addEventListener('keydown', (e) => {
+                if (isModalOpen) {
+                    if (e.key === 'Escape' && items.length > 0) {
+                        closeModal();
+                    }
+                    return; // Don't trigger slide shortcuts while typing in modal!
+                }
+
                 const key = e.key.toLowerCase();
 
-                if (e.key === 'ArrowRight' || e.key === 'Enter' || key === 'n') {
+                if (key === 'n' || key === 's') {
+                    e.preventDefault();
+                    openModal();
+                    return;
+                }
+
+                if (e.key === 'ArrowRight' || e.key === 'Enter') {
                     goToSlide(currentIndex + 1);
                     startSlideshow();
                 } else if (e.key === 'ArrowLeft' || key === 'p') {
@@ -888,13 +1258,16 @@
                 if (cached) {
                     const cachedItems = JSON.parse(cached);
                     if (Array.isArray(cachedItems) && cachedItems.length > 0) {
-                        items = cachedItems;
-                        renderSlides();
-                        startSlideshow();
-                        if (loader) loader.style.display = 'none';
+                        allSheetRows = cachedItems;
                     }
                 }
             } catch (e) {}
+
+            // Open row selector modal by default when index opens
+            openModal();
+            if (selectedNo && noInput) {
+                noInput.value = selectedNo;
+            }
 
             // Initial fetch from Google Sheet
             fetchSheetData();
