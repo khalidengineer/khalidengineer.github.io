@@ -163,7 +163,7 @@ export default function ITSupportPage() {
                 </MagneticButton>
               </Link>
               <a
-                href="mailto:contact@mdkhalid.dev?subject=Enterprise%20IT%20Inquiry"
+                href="mailto:khalidengineer@outlook.com?subject=Enterprise%20IT%20Inquiry"
                 className="px-6 py-3.5 rounded-xl bg-[#181813] border border-white/[0.1] text-text-main font-semibold text-xs uppercase tracking-wider hover:border-gold-primary/40 transition-colors flex items-center justify-center gap-2"
               >
                 <PhoneCall className="w-4 h-4 text-gold-primary" />

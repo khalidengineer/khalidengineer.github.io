@@ -533,8 +533,8 @@ export const testimonialsList: TestimonialItem[] = [
 ];
 
 export const contactInfo = {
-  email: "contact@mdkhalid.dev",
-  phone: "+1 (234) 567-8900",
-  location: "San Francisco, CA, USA",
+  email: "khalidengineer@outlook.com",
+  phone: "+91-9102603030",
+  location: "Darbhanga Bihar Bhairopatti 846009",
   availability: "Mon - Fri (9AM - 6PM PST)",
 };

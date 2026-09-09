@@ -34,7 +34,7 @@ export default function PrivacyPage() {
           </p>
           <h2 className="text-base font-bold text-text-main pt-4">3. Contact</h2>
           <p>
-            For any questions regarding your data, please contact contact@mdkhalid.dev.
+            For any questions regarding your data, please contact khalidengineer@outlook.com.
           </p>
         </div>
       </div>
