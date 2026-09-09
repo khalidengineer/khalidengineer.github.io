@@ -3,8 +3,8 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 export const metadata = {
-  title: "Privacy Policy — Dev Arjun",
-  description: "Privacy policy for Dev Arjun portfolio.",
+  title: "Privacy Policy — MD Khalid",
+  description: "Privacy policy for MD Khalid portfolio.",
 };
 
 export default function PrivacyPage() {
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
           </p>
           <h2 className="text-base font-bold text-text-main pt-4">3. Contact</h2>
           <p>
-            For any questions regarding your data, please contact hello@devarjun.app.
+            For any questions regarding your data, please contact contact@mdkhalid.dev.
           </p>
         </div>
       </div>

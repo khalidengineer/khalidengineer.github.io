@@ -21,7 +21,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Dev Arjun — Full Stack Developer & Creative Technologist",
+  title: "MD Khalid — Full Stack Developer & Creative Technologist",
   description:
     "Full-stack developer crafting beautiful, fast and scalable digital products that solve real-world problems. Modern web experiences, high-performance architectures, and UI/UX design.",
   keywords: [
@@ -33,23 +33,24 @@ export const metadata: Metadata = {
     "Three.js",
     "Tailwind CSS",
     "Web Development",
-    "Arjun",
+    "MD Khalid",
+    "Khalid",
   ],
-  authors: [{ name: "Dev Arjun" }],
-  creator: "Dev Arjun",
+  authors: [{ name: "MD Khalid" }],
+  creator: "MD Khalid",
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://devarjun.app",
-    title: "Dev Arjun — Full Stack Developer",
+    url: "https://khalidengineer.github.io",
+    title: "MD Khalid — Full Stack Developer",
     description: "Full-stack developer crafting beautiful, fast and scalable digital products.",
-    siteName: "Dev Arjun Portfolio",
+    siteName: "MD Khalid Portfolio",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dev Arjun — Full Stack Developer",
+    title: "MD Khalid — Full Stack Developer",
     description: "Full-stack developer crafting beautiful, fast and scalable digital products.",
-    creator: "@devarjun",
+    creator: "@khalidengineer",
   },
   icons: {
     icon: "/icon.svg",

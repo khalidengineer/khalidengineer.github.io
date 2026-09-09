@@ -25,13 +25,13 @@ export default function Footer() {
             <circle cx="12" cy="12" r="2.5" fill="#F4B83F" />
           </svg>
           <span className="font-bold tracking-wider text-xs text-text-main font-mono">
-            DEV<span className="text-gold-primary">.</span>ARJUN
+            MD<span className="text-gold-primary">.</span>KHALID
           </span>
         </div>
 
         {/* Center: Copyright */}
         <div className="text-xs text-text-muted">
-          © {new Date().getFullYear()} Dev Arjun. All rights reserved.
+          © {new Date().getFullYear()} MD Khalid. All rights reserved.
         </div>
 
         {/* Right: Legal & Scroll-to-Top */}

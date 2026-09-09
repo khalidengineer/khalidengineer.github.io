@@ -26,11 +26,11 @@ export default function AboutSection() {
 
         {/* 2-Subcolumn Layout inside About Card */}
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-5 items-start mt-2">
-          {/* Sub-column 1: Arjun Working at Laptop Photo with Gold Signature */}
+          {/* Sub-column 1: MD Khalid Working at Laptop Photo with Gold Signature */}
           <div className="sm:col-span-5 relative w-full max-w-[240px] sm:max-w-none mx-auto aspect-[3/3.8] rounded-xl overflow-hidden border border-white/[0.08] bg-[#141410] shadow-md group/img">
             <Image
               src="/images/profile/about-laptop.webp"
-              alt="Arjun working at desk with laptop"
+              alt="MD Khalid working at desk with laptop"
               fill
               className="object-cover group-hover/img:scale-105 transition-transform duration-500"
               sizes="(max-width: 640px) 240px, 240px"
@@ -39,7 +39,7 @@ export default function AboutSection() {
 
             {/* Handwritten Gold Signature with Shimmer */}
             <div className="absolute bottom-2.5 left-3 font-signature text-gold-bright text-xl sm:text-2xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] select-none animate-pulse-slow">
-              Arjun
+              MD Khalid
             </div>
           </div>
 
@@ -76,7 +76,7 @@ export default function AboutSection() {
 
             {/* Download CV CTA */}
             <div>
-              <a href="/resume.pdf" download="Dev_Arjun_Resume.pdf">
+              <a href="/resume.pdf" download="MD_Khalid_Resume.pdf">
                 <MagneticButton className="px-4 py-2 rounded-xl bg-[#181813] hover:bg-gold-primary hover:text-black text-text-main border border-white/[0.1] hover:border-gold-primary text-xs font-semibold tracking-wide transition-all duration-300 gap-2 flex items-center shadow-sm">
                   <span>Download CV</span>
                   <Download className="w-3.5 h-3.5" />

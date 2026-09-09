@@ -15,8 +15,6 @@ export default function SkillsPage() {
     if (filter === "all") return true;
     if (filter === "frontend") return s.category === "frontend";
     if (filter === "backend") return s.category === "backend";
-    if (filter === "it-infra") return s.category === "it-infra" || s.category === "cloud";
-    if (filter === "tools") return s.category === "tools";
     return true;
   });
 
@@ -69,11 +67,9 @@ export default function SkillsPage() {
             {/* Filter Pills */}
             <div className="flex flex-wrap gap-1.5 sm:gap-2 p-1 sm:p-1.5 rounded-2xl bg-[#141410] border border-white/[0.06] shrink-0">
               {[
-                { id: "all", label: "All Tech" },
+                { id: "all", label: "All Stack" },
                 { id: "frontend", label: "Frontend" },
                 { id: "backend", label: "Backend" },
-                { id: "it-infra", label: "IT & Cloud" },
-                { id: "tools", label: "Tools" },
               ].map((cat) => (
                 <button
                   key={cat.id}

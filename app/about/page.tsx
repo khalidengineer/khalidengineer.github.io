@@ -9,8 +9,8 @@ import MagneticButton from "@/components/ui/MagneticButton";
 import TiltCard from "@/components/ui/TiltCard";
 
 export const metadata = {
-  title: "About — Dev Arjun | Senior Full-Stack Engineer & IT Executive",
-  description: "Learn more about Arjun, a passionate Full-Stack Developer and Senior IT Systems Architect with 5+ years of experience building scalable digital products and enterprise cloud infrastructure.",
+  title: "About — MD Khalid | Senior Full-Stack Engineer & IT Executive",
+  description: "Learn more about MD Khalid, a passionate Full-Stack Developer and Senior IT Systems Architect with 5+ years of experience building scalable digital products and enterprise cloud infrastructure.",
 };
 
 export default function AboutPage() {
@@ -63,7 +63,7 @@ export default function AboutPage() {
               <div className="relative max-w-[280px] mx-auto lg:max-w-none aspect-[3/3.8] rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl bg-[#141410]">
                 <Image
                   src="/images/profile/about-laptop.webp"
-                  alt="Dev Arjun working on code"
+                  alt="MD Khalid working on code"
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 420px"
@@ -71,7 +71,7 @@ export default function AboutPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
                 <div className="absolute bottom-4 left-5 font-signature text-gold-bright text-3xl select-none drop-shadow-md">
-                  Arjun
+                  MD Khalid
                 </div>
               </div>
             </div>
@@ -103,7 +103,7 @@ export default function AboutPage() {
 
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center gap-4">
-                <a href="/resume.pdf" download="Dev_Arjun_Resume.pdf">
+                <a href="/resume.pdf" download="MD_Khalid_Resume.pdf">
                   <MagneticButton className="px-6 py-3 rounded-xl bg-gold-primary hover:bg-gold-bright text-black font-bold text-xs sm:text-sm tracking-wide shadow-[0_0_20px_rgba(244,184,63,0.3)] transition-all flex items-center gap-2">
                     <span>Download Full CV</span>
                     <Download className="w-4 h-4 stroke-[2.5]" />

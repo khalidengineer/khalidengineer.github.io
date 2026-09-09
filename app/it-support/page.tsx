@@ -1,8 +1,5 @@
 import React from "react";
 import ITSupportSection from "@/components/it-support/ITSupportSection";
-import NetworkTopologySection from "@/components/executive/NetworkTopologySection";
-import DisasterRecoverySection from "@/components/executive/DisasterRecoverySection";
-import ComplianceSecuritySection from "@/components/executive/ComplianceSecuritySection";
 import ZeroTouchLifecycleSection from "@/components/executive/ZeroTouchLifecycleSection";
 import SLAMatrixSection from "@/components/executive/SLAMatrixSection";
 import FinOpsVendorSection from "@/components/executive/FinOpsVendorSection";
@@ -25,9 +22,9 @@ import {
 } from "lucide-react";
 
 export const metadata = {
-  title: "Senior IT Support & Enterprise Infrastructure — Dev Arjun",
+  title: "Senior IT Support & Enterprise Infrastructure — MD Khalid",
   description:
-    "Tier-3 enterprise IT support, hybrid cloud systems administration, network architecture, zero-trust cybersecurity, and IT leadership by Dev Arjun.",
+    "Tier-3 enterprise IT support, hybrid cloud systems administration, network architecture, zero-trust cybersecurity, and IT leadership by MD Khalid.",
 };
 
 export default function ITSupportPage() {
@@ -96,9 +93,6 @@ export default function ITSupportPage() {
             <span className="text-[11px] sm:text-xs font-semibold text-text-muted self-center mr-1 sm:mr-2">Jump to:</span>
             {[
               { label: "Core Services", href: "#it-support" },
-              { label: "Network Topology", href: "#network-topology" },
-              { label: "Disaster Recovery", href: "#disaster-recovery" },
-              { label: "Security & GRC", href: "#security-compliance" },
               { label: "Zero-Touch", href: "#zero-touch" },
               { label: "SLA Matrix", href: "#sla-matrix" },
               { label: "FinOps", href: "#finops-vendor" },
@@ -120,20 +114,8 @@ export default function ITSupportPage() {
           <ITSupportSection />
         </div>
 
-        {/* 2. Network Topology & SD-WAN */}
-        <div id="network-topology">
-          <NetworkTopologySection />
-        </div>
 
-        {/* 3. Disaster Recovery & BCP */}
-        <div id="disaster-recovery">
-          <DisasterRecoverySection />
-        </div>
 
-        {/* 4. Security, Governance & GRC */}
-        <div id="security-compliance">
-          <ComplianceSecuritySection />
-        </div>
 
         {/* 5. Zero-Touch Lifecycle Automation */}
         <div id="zero-touch">
@@ -181,7 +163,7 @@ export default function ITSupportPage() {
                 </MagneticButton>
               </Link>
               <a
-                href="mailto:contact@devarjun.com?subject=Enterprise%20IT%20Inquiry"
+                href="mailto:contact@mdkhalid.dev?subject=Enterprise%20IT%20Inquiry"
                 className="px-6 py-3.5 rounded-xl bg-[#181813] border border-white/[0.1] text-text-main font-semibold text-xs uppercase tracking-wider hover:border-gold-primary/40 transition-colors flex items-center justify-center gap-2"
               >
                 <PhoneCall className="w-4 h-4 text-gold-primary" />

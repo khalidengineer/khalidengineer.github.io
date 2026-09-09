@@ -3,8 +3,8 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 export const metadata = {
-  title: "Terms of Service — Dev Arjun",
-  description: "Terms of service for Dev Arjun portfolio.",
+  title: "Terms of Service — MD Khalid",
+  description: "Terms of service for MD Khalid portfolio.",
 };
 
 export default function TermsPage() {
@@ -26,7 +26,7 @@ export default function TermsPage() {
           </p>
           <h2 className="text-base font-bold text-text-main pt-4">1. Intellectual Property</h2>
           <p>
-            All code samples, visual designs, interactive demonstrations, and brand assets presented on this site are the intellectual property of Arjun unless stated otherwise.
+            All code samples, visual designs, interactive demonstrations, and brand assets presented on this site are the intellectual property of MD Khalid unless stated otherwise.
           </p>
           <h2 className="text-base font-bold text-text-main pt-4">2. Client Work &amp; Case Studies</h2>
           <p>

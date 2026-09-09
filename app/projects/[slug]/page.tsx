@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props) {
   const project = projectsList.find((p) => p.slug === params.slug);
   if (!project) return { title: "Project Not Found" };
   return {
-    title: `${project.title} — Dev Arjun Case Study`,
+    title: `${project.title} — MD Khalid Case Study`,
     description: project.subtitle,
   };
 }

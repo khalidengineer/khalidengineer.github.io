@@ -2,8 +2,8 @@ import React from "react";
 import ContactSection from "@/components/contact/ContactSection";
 
 export const metadata = {
-  title: "Contact — Dev Arjun",
-  description: "Get in touch with Arjun to discuss web development, frontend architecture, and technical design.",
+  title: "Contact — MD Khalid",
+  description: "Get in touch with MD Khalid to discuss web development, frontend architecture, and technical design.",
 };
 
 export default function ContactPage() {

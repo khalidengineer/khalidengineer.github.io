@@ -13,7 +13,7 @@ export default function Loading() {
           <circle cx="12" cy="12" r="3" fill="#F4B83F" />
         </svg>
         <span className="font-bold tracking-widest text-lg text-text-main font-mono">
-          DEV<span className="text-gold-primary">.</span>ARJUN
+          MD<span className="text-gold-primary">.</span>KHALID
         </span>
       </div>
 

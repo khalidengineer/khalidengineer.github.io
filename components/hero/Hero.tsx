@@ -126,7 +126,7 @@ export default function Hero() {
               <div className="relative w-full h-full rounded-2xl overflow-hidden">
                 <Image
                   src="/images/profile/hero-portrait.webp"
-                  alt="Dev Arjun - Full-Stack Developer"
+                  alt="MD Khalid - Full-Stack Developer"
                   fill
                   priority
                   className="object-cover object-top scale-105"

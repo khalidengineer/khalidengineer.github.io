@@ -4,12 +4,9 @@ import AboutSection from "@/components/about/AboutSection";
 import SkillsSection from "@/components/skills/SkillsSection";
 import ServicesSection from "@/components/services/ServicesSection";
 import ITSupportSection from "@/components/it-support/ITSupportSection";
-import DisasterRecoverySection from "@/components/executive/DisasterRecoverySection";
-import ComplianceSecuritySection from "@/components/executive/ComplianceSecuritySection";
 import ZeroTouchLifecycleSection from "@/components/executive/ZeroTouchLifecycleSection";
 import SLAMatrixSection from "@/components/executive/SLAMatrixSection";
 import FinOpsVendorSection from "@/components/executive/FinOpsVendorSection";
-import NetworkTopologySection from "@/components/executive/NetworkTopologySection";
 import ITLeadershipSection from "@/components/executive/ITLeadershipSection";
 import ProjectsSection from "@/components/projects/ProjectsSection";
 import ExperienceSection from "@/components/experience/ExperienceSection";
@@ -36,14 +33,8 @@ export default function HomePage() {
       {/* 4. Senior IT Support & Enterprise Operations Section */}
       <ITSupportSection />
 
-      {/* 5. Enterprise Network Architecture & Hybrid Topology */}
-      <NetworkTopologySection />
 
-      {/* 6. Disaster Recovery & Business Continuity (BCP) */}
-      <DisasterRecoverySection />
 
-      {/* 7. Governance, Compliance & Cybersecurity (GRC) */}
-      <ComplianceSecuritySection />
 
       {/* 8. Zero-Touch Onboarding & Lifecycle Automation */}
       <ZeroTouchLifecycleSection />

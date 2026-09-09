@@ -22,9 +22,9 @@ import {
 } from "lucide-react";
 
 export const metadata = {
-  title: "Experience — Dev Arjun | Career Milestones & Executive Impact",
+  title: "Experience — MD Khalid | Career Milestones & Executive Impact",
   description:
-    "Work experience, career timeline, quantified executive leadership impact, and incident war room track record of Dev Arjun.",
+    "Work experience, career timeline, quantified executive leadership impact, and incident war room track record of MD Khalid.",
 };
 
 export default function ExperiencePage() {
@@ -325,7 +325,7 @@ export default function ExperiencePage() {
             <div className="flex flex-col sm:flex-row gap-4 shrink-0">
               <a
                 href="/resume.pdf"
-                download="Arjun_Senior_IT_Software_Engineer_CV.pdf"
+                download="MD_Khalid_Senior_IT_Software_Engineer_CV.pdf"
                 className="px-6 py-3.5 rounded-xl bg-gold-primary text-black font-bold text-xs uppercase tracking-wider hover:bg-gold-bright transition-all shadow-[0_0_20px_rgba(244,184,63,0.3)] flex items-center justify-center gap-2"
               >
                 <Download className="w-4 h-4" />

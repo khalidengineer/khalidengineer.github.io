@@ -48,7 +48,7 @@ export default function Navbar() {
             </svg>
           </div>
           <span className="font-bold tracking-wider text-sm text-text-main font-mono">
-            DEV<span className="text-gold-primary">.</span>ARJUN
+            MD<span className="text-gold-primary">.</span>KHALID
           </span>
         </Link>
 

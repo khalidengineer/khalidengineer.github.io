@@ -49,16 +49,6 @@ export const skillsList: SkillItem[] = [
   { name: "Tailwind CSS", category: "frontend", iconType: "tailwind", color: "#06B6D4", proficiency: 98, description: "Utility-first CSS, custom design tokens, responsive layouts" },
   { name: "MongoDB", category: "backend", iconType: "mongodb", color: "#47A248", proficiency: 88, description: "Aggregation pipelines, indexing, sharding, Mongoose ODM" },
   { name: "PostgreSQL", category: "backend", iconType: "postgresql", color: "#4169E1", proficiency: 89, description: "Relational modeling, indexing, transactions, Prisma & Drizzle" },
-  { name: "Git", category: "tools", iconType: "git", color: "#F05032", proficiency: 95, description: "Git flow, branching strategies, rebasing, bisect, CI triggers" },
-  { name: "Docker", category: "tools", iconType: "docker", color: "#2496ED", proficiency: 87, description: "Containerization, multi-stage builds, compose networks" },
-  { name: "AWS", category: "cloud", iconType: "aws", color: "#FF9900", proficiency: 85, description: "S3, CloudFront, Lambda, ECS, Route 53, IAM policies" },
-  { name: "Figma", category: "tools", iconType: "figma", color: "#F24E1E", proficiency: 92, description: "Design systems, auto-layout, interactive prototypes, variables" },
-  { name: "GraphQL", category: "backend", iconType: "graphql", color: "#E10098", proficiency: 88, description: "Schemas, resolvers, Apollo Client & Server, subscriptions" },
-  { name: "Azure AD / Entra ID", category: "it-infra", iconType: "ts", color: "#0078D4", proficiency: 95, description: "Conditional Access, PIM, SSO, Hybrid Join, Zero-Trust" },
-  { name: "Cisco Networking", category: "it-infra", iconType: "js", color: "#1BA0D7", proficiency: 90, description: "VLANs, BGP, OSPF, Spanning Tree, ACLs, Meraki SD-WAN" },
-  { name: "Windows Server 2022", category: "it-infra", iconType: "node", color: "#00A4EF", proficiency: 94, description: "Active Directory Domain Services, GPO, DNS, DHCP, Hyper-V" },
-  { name: "Linux Administration", category: "it-infra", iconType: "git", color: "#FCC624", proficiency: 92, description: "Ubuntu/RHEL, systemd, hardening, Bash automation, SSH keys" },
-  { name: "Microsoft Intune & MDM", category: "it-infra", iconType: "next", color: "#5C2D91", proficiency: 94, description: "Autopilot zero-touch, compliance policies, BitLocker, JAMF" },
 ];
 
 export interface ServiceItem {
@@ -492,7 +482,7 @@ export const testimonialsList: TestimonialItem[] = [
     name: "Sarah Johnson",
     role: "Product Manager",
     company: "TechNova",
-    quote: "Arjun is an exceptional developer who delivers high-quality work on time. His attention to detail and problem-solving skills are top-notch.",
+    quote: "Khalid is an exceptional developer who delivers high-quality work on time. His attention to detail and problem-solving skills are top-notch.",
     rating: 5,
     avatar: "/images/testimonials/sarah.webp"
   },
@@ -501,7 +491,7 @@ export const testimonialsList: TestimonialItem[] = [
     name: "Michael Chen",
     role: "CEO",
     company: "DataFlow",
-    quote: "Working with Arjun was a fantastic experience. He understood our requirements perfectly and built a product that exceeded our expectations.",
+    quote: "Working with Khalid was a fantastic experience. He understood our requirements perfectly and built a product that exceeded our expectations.",
     rating: 5,
     avatar: "/images/testimonials/michael.webp"
   },
@@ -519,7 +509,7 @@ export const testimonialsList: TestimonialItem[] = [
     name: "David Vance",
     role: "Chief Information Security Officer (CISO)",
     company: "Apex Global Security",
-    quote: "Arjun's implementation of our zero-trust identity architecture and disaster recovery drills was flawless. He achieved SOC 2 Type II audit readiness two months ahead of schedule.",
+    quote: "Khalid's implementation of our zero-trust identity architecture and disaster recovery drills was flawless. He achieved SOC 2 Type II audit readiness two months ahead of schedule.",
     rating: 5,
     avatar: "/images/testimonials/michael.webp"
   },
@@ -528,7 +518,7 @@ export const testimonialsList: TestimonialItem[] = [
     name: "Priya Sharma",
     role: "VP of Engineering",
     company: "CloudScale Systems",
-    quote: "An exceptional hybrid technologist who bridges frontend craft with deep enterprise cloud reliability. Arjun eliminated our production incident backlog and scaled our systems to 99.99% uptime.",
+    quote: "An exceptional hybrid technologist who bridges frontend craft with deep enterprise cloud reliability. Khalid eliminated our production incident backlog and scaled our systems to 99.99% uptime.",
     rating: 5,
     avatar: "/images/testimonials/sarah.webp"
   },
@@ -537,14 +527,14 @@ export const testimonialsList: TestimonialItem[] = [
     name: "Marcus Brody",
     role: "Director of Global Operations",
     company: "NorthStar Capital",
-    quote: "Under Arjun's technical leadership, our IT onboarding process was transformed from 3 days to 12 minutes with zero touch. His cost optimization initiatives saved our firm over $180K annually.",
+    quote: "Under Khalid's technical leadership, our IT onboarding process was transformed from 3 days to 12 minutes with zero touch. His cost optimization initiatives saved our firm over $180K annually.",
     rating: 5,
     avatar: "/images/testimonials/emily.webp"
   }
 ];
 
 export const contactInfo = {
-  email: "hello@devarjun.app",
+  email: "contact@mdkhalid.dev",
   phone: "+1 (234) 567-8900",
   location: "San Francisco, CA, USA",
   availability: "Mon - Fri (9AM - 6PM PST)",

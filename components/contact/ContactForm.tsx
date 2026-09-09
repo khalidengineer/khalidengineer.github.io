@@ -59,7 +59,7 @@ export default function ContactForm() {
         </div>
         <h4 className="text-lg font-bold text-text-main mb-2">Message Sent Successfully!</h4>
         <p className="text-xs text-text-secondary mb-6 max-w-xs">
-          Thank you for reaching out, {formData.name}. Arjun will get back to you within 24 hours.
+          Thank you for reaching out, {formData.name}. MD Khalid will get back to you within 24 hours.
         </p>
         <button
           onClick={() => {

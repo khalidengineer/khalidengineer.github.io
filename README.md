@@ -1,4 +1,4 @@
-# DEV.ARJUN — Luxury Dark Developer Portfolio
+# MD.KHALID — Luxury Dark Developer Portfolio
 
 An ultra-premium, dark luxury developer portfolio website recreated in **Next.js 14 App Router**, **TypeScript**, **Tailwind CSS**, and **Three.js / React Three Fiber** with 99%+ visual fidelity to the original reference design.
 
@@ -143,4 +143,4 @@ npm run start
 ---
 
 ## 📄 License
-© 2024 Dev Arjun. All rights reserved.
+© 2024 MD Khalid. All rights reserved.

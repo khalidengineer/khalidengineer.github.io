@@ -23,8 +23,8 @@ export default function SkillsSection() {
           />
         </div>
 
-        {/* 5 x 3 Grid of 15 Skill Cards */}
-        <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5 sm:gap-2.5 mt-2">
+        {/* 5 x 2 Grid of 10 Skill Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 sm:gap-2.5 mt-2">
           {skillsList.map((skill, idx) => (
             <SkillCard key={skill.name} skill={skill} index={idx} />
           ))}
